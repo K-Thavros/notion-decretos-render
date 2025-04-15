@@ -48,10 +48,20 @@ app.post("/decretar", async (req, res) => {
 
     res.status(200).send({ message: "Decreto ejecutado con éxito." });
   } catch (err) {
-    console.error("❌ Error al crear decreto:", err);
-    res.status(500).send({ error: "Error ejecutando el decreto." });
+  console.error("❌ Error al crear decreto:", err.message);
+
+  if (err.code) console.error("Código de error:", err.code);
+  if (err.status) console.error("Status HTTP:", err.status);
+  if (err.body) {
+    console.error("Detalles del error:", JSON.stringify(err.body, null, 2));
   }
-});
+
+  res.status(500).send({
+    error: "Error ejecutando el decreto.",
+    detalles: err.body || err.message
+  });
+}
+
 
 // Endpoint raíz de prueba
 app.get("/", (_, res) => {
