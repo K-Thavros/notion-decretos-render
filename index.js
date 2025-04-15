@@ -66,3 +66,16 @@ app.post("/webhook", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Dominus operando en puerto ${PORT}`));
+// index.js (solo añade esto debajo de app.use)
+
+app.post("/webhook", (req, res) => {
+  const notionToken = req.headers["notion-webhook-challenge"];
+  if (notionToken) {
+    console.log("🔐 Token de verificación recibido:", notionToken);
+    return res.status(200).send(notionToken); // RESPONDE con el token como texto plano
+  }
+
+  console.log("📡 Evento webhook recibido:", req.body);
+  res.status(200).send("OK");
+});
+
