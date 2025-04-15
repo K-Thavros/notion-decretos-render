@@ -10,6 +10,7 @@ app.use(express.json());
 const notion = new Client({ auth: process.env.NOTION_TOKEN });
 const databaseId = process.env.DATABASE_ID;
 
+// Endpoint para recibir nuevos decretos desde GPT u otra interfaz
 app.post("/decretar", async (req, res) => {
   const {
     nombre,
@@ -47,14 +48,21 @@ app.post("/decretar", async (req, res) => {
 
     res.status(200).send({ message: "Decreto ejecutado con éxito." });
   } catch (err) {
-    console.error(err);
+    console.error("❌ Error al crear decreto:", err);
     res.status(500).send({ error: "Error ejecutando el decreto." });
   }
 });
 
+// Endpoint raíz de prueba
 app.get("/", (_, res) => {
   res.send("Dominus API está viva.");
 });
 
+// Endpoint para Webhook de Notion
+app.post("/webhook", (req, res) => {
+  console.log("📡 Webhook recibido desde Notion:", req.body);
+  res.status(200).send("Webhook conectado con éxito.");
+});
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Dominus operando en puerto ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Dominus operando en puerto ${PORT}`));
