@@ -63,6 +63,18 @@ app.post("/webhook", (req, res) => {
   console.log("📡 Webhook recibido desde Notion:", req.body);
   res.status(200).send("Webhook conectado con éxito.");
 });
+app.post("/webhook", express.text({ type: "*/*" }), (req, res) => {
+  const verificationToken = req.headers["notion-verification-token"];
+
+  if (verificationToken) {
+    console.log("TOKEN DE VERIFICACIÓN RECIBIDO:", verificationToken);
+    // Aquí puedes opcionalmente guardar o verificar el token si quieres que sea seguro
+    res.status(200).send();
+  } else {
+    console.log("No se recibió token de verificación");
+    res.status(400).send();
+  }
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Dominus operando en puerto ${PORT}`));
