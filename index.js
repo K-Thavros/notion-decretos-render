@@ -48,39 +48,39 @@ app.post("/decretar", async (req, res) => {
 
     res.status(200).send({ message: "Decreto ejecutado con éxito." });
   } catch (err) {
-  console.error("❌ Error al crear decreto:", err.message);
+    console.error("❌ Error al crear decreto:", err.message);
 
-  if (err.code) console.error("Código de error:", err.code);
-  if (err.status) console.error("Status HTTP:", err.status);
-  if (err.body) {
-    console.error("Detalles del error:", JSON.stringify(err.body, null, 2));
-  }
+    if (err.code) console.error("Código de error:", err.code);
+    if (err.status) console.error("Status HTTP:", err.status);
+    if (err.body) {
+      console.error("Detalles del error:", JSON.stringify(err.body, null, 2));
+    }
 
-  res.status(500).send({
-    error: "Error ejecutando el decreto.",
-    detalles: err.body || err.message
-  });
-}
-
+    res.status(500).send({
+      error: "Error ejecutando el decreto.",
+      detalles: err.body || err.message
+    });
+  } // ← ESTA llave faltaba
+});
 
 // Endpoint raíz de prueba
 app.get("/", (_, res) => {
   res.send("Dominus API está viva.");
 });
 
-// Endpoint para Webhook de Notion
+// Endpoint para Webhook de Notion (1)
 app.post("/webhook", (req, res) => {
   const { verification_token } = req.body;
   console.log("🛰️ Webhook recibido desde Notion:", req.body);
   res.send(verification_token);
 });
 
+// Endpoint para Webhook de Notion (2 - oficial con cabecera)
 app.post("/webhook", express.text({ type: "*/*" }), (req, res) => {
   const verificationToken = req.headers["notion-verification-token"];
 
   if (verificationToken) {
     console.log("TOKEN DE VERIFICACIÓN RECIBIDO:", verificationToken);
-    // Aquí puedes opcionalmente guardar o verificar el token si quieres que sea seguro
     res.status(200).send();
   } else {
     console.log("No se recibió token de verificación");
@@ -88,18 +88,17 @@ app.post("/webhook", express.text({ type: "*/*" }), (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Dominus operando en puerto ${PORT}`));
-// index.js (solo añade esto debajo de app.use)
-
+// Endpoint para responder al challenge
 app.post("/webhook", (req, res) => {
   const notionToken = req.headers["notion-webhook-challenge"];
   if (notionToken) {
     console.log("🔐 Token de verificación recibido:", notionToken);
-    return res.status(200).send(notionToken); // RESPONDE con el token como texto plano
+    return res.status(200).send(notionToken);
   }
 
   console.log("📡 Evento webhook recibido:", req.body);
   res.status(200).send("OK");
 });
 
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Dominus operando en puerto ${PORT}`));
