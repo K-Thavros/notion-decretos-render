@@ -60,9 +60,11 @@ app.get("/", (_, res) => {
 
 // Endpoint para Webhook de Notion
 app.post("/webhook", (req, res) => {
-  console.log("📡 Webhook recibido desde Notion:", req.body);
-  res.status(200).send("Webhook conectado con éxito.");
+  const { verification_token } = req.body;
+  console.log("🛰️ Webhook recibido desde Notion:", req.body);
+  res.send(verification_token);
 });
+
 app.post("/webhook", express.text({ type: "*/*" }), (req, res) => {
   const verificationToken = req.headers["notion-verification-token"];
 
